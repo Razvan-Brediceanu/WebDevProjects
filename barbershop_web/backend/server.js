@@ -5,7 +5,6 @@ require('dotenv').config()
 
 const app = express()
 const PORT = process.env.PORT || 4000
-const HOST = 'ec2-51-20-131-65.eu-north-1.compute.amazonaws.com' // Update with your actual EC2 instance DNS name
 
 // Middleware
 app.use(
@@ -21,6 +20,7 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
+
 const connection = mongoose.connection
 
 connection.once('open', () => {
@@ -34,7 +34,12 @@ const refreshTokenRouter = require('./routes/refreshToken')
 app.use('/user', userRouter)
 app.use('/auth/refresh', refreshTokenRouter) // Use refreshTokenRouter for refreshing tokens
 
+// Custom route for Vercel health checks
+app.get('/api/health', (req, res) => {
+  res.status(200).send('OK')
+})
+
 // Start the server
-app.listen(PORT, HOST, () => {
-  console.log(`Server is running at https://${HOST}:${PORT}/`)
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`)
 })
